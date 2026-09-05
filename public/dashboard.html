@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="viewport" content="width=device-width, initial-scale=1"><title>JPay Dashboard</title>
+<style>
+*{box-sizing:border-box;font-family:system-ui}body{margin:0;background:#f0f2f5;padding:15px;max-width:500px;margin:auto}.card{background:white;border-radius:16px;padding:20px;margin-bottom:15px;box-shadow:0 2px 12px rgba(0,0,0,0.08)}h1{color:#00a651;text-align:center}input,button{width:100%;padding:14px;margin:7px 0;border-radius:10px;border:1px solid #ddd;font-size:16px}button{background:#00a651;color:white;border:0;font-weight:bold}.balance{font-size:36px;font-weight:800;color:#00a651;text-align:center}.hidden{display:none}.success{color:#00a651;background:#e6f6ec;padding:10px;border-radius:8px;margin-top:10px;text-align:center}.error{color:#d00;background:#fde8e8;padding:10px;border-radius:8px;margin-top:10px;text-align:center}
+</style></head>
+<body>
+<div id="loginView"><h1>JPay 🇰🇪</h1><div class="card"><h2>Login</h2><input id="phone" placeholder="Phone"><input id="pin" type="password" placeholder="PIN" maxlength="4"><button onclick="login()">Login</button><div id="login_msg"></div></div></div>
+<div id="dashView" class="hidden">
+<h1>JPay Dashboard</h1>
+<div class="card" style="background:#00a651;color:white"><div>Hello <span id="u_name">-</span></div><div id="u_phone" style="font-size:12px"></div><div class="balance" style="color:white" id="u_balance">KES 0</div></div>
+<div class="card"><h2>💸 Send Money (5 KES fee)</h2><input id="to_phone" placeholder="To phone" oninput="previewReceiver()">
+<div id="receiver_preview" style="font-size:13px;color:#00a651;font-weight:bold;height:18px"></div><input id="amount" type="number" placeholder="Amount"><input id="send_pin" type="password" placeholder="Your PIN" maxlength="4"><button onclick="sendMoney()">Send Now</button><div id="send_msg"></div></div>
+<div class="card"><h2>📜 History</h2><button onclick="loadHistory()" style="background:#eee;color:#333">Refresh</button><div id="history"></div></div>
+<div class="card"><h2>Deposit</h2><input id="dep_amount" type="number" placeholder="Amount"><button onclick="doDeposit()" style="background:#111">Add Money</button><div id="dep_msg"></div></div>
+<div style="text-align:center"><span onclick="localStorage.clear();location.reload()" style="color:#666;text-decoration:underline;cursor:pointer;font-size:13px">Logout</span></div>
+</div>
+<script>
+let currentUser=null,currentPin=null;
+async function api(p,b){const r=await fetch(p,{method:b?'POST':'GET',headers:{'Content-Type':'application/json'},body:b?JSON.stringify(b):null});return r.json();}
+async function login(){const phone=document.getElementById('phone').value.trim();const pin=document.getElementById('pin').value.trim();const r=await api(`/api/user/${phone}?pin=${pin}`);if(r.error){document.getElementById('login_msg').innerHTML=`<div class=error>${r.error}</div>`;return;}currentUser=r.user;currentPin=pin;localStorage.setItem('jpay_phone',phone);localStorage.setItem('jpay_pin',pin);document.getElementById('loginView').classList.add('hidden');document.getElementById('dashView').classList.remove('hidden');document.getElementById('u_name').innerText=currentUser.name;document.getElementById('u_phone').innerText=currentUser.phone;document.getElementById('u_balance').innerText=`KES ${currentUser.balance}`;document.getElementById('send_pin').value=currentPin;loadHistory();}
+async function loadHistory(){const r=await api(`/api/user/${currentUser.phone}?pin=${currentPin}`);if(r.user){currentUser=r.user;document.getElementById('u_balance').innerText=`KES ${currentUser.balance}`;}const h=document.getElementById('history');h.innerHTML=(r.transactions||[]).map(t=>{const out=t.from_user_id===currentUser.id;return `<div style="border-bottom:1px solid #eee;padding:8px 0;display:flex;justify-content:space-between"><div><b>${out?'Sent':'Got'}</b> ${t.type} <br><small>${new Date(t.created_at).toLocaleString()}</small></div><div style="color:${out?'red':'green'}">${out?'-':'+'}${t.amount}</div></div>`}).join('')||'No tx';}
+async function sendMoney(){const to_phone=document.getElementById('to_phone').value.trim();const amount=document.getElementById('amount').value.trim();const pin=document.getElementById('send_pin').value.trim();document.getElementById('send_msg').innerHTML='Sending...';const r=await api('/transfer',{from_phone:currentUser.phone,to_phone,amount,pin});document.getElementById('send_msg').innerHTML=r.error?`<div class=error>${r.error}</div>`:`<div class=success>✅ Sent KES ${r.amount} to ${document.getElementById('to_phone').value}</div>`;if(!r.error)loadHistory();}
+async function doDeposit(){const amount=document.getElementById('dep_amount').value;const r=await api('/deposit',{phone:currentUser.phone,amount});document.getElementById('dep_msg').innerHTML=r.error?`<div class=error>${r.error}</div>`:`<div class=success>New bal ${r.new_balance}</div>`;if(!r.error)loadHistory();}
+window.onload=()=>{const p=localStorage.getItem('jpay_phone'),pin=localStorage.getItem('jpay_pin');if(p&&pin){document.getElementById('phone').value=p;document.getElementById('pin').value=pin;login();}}
+async function previewReceiver(){
+  const phone=document.getElementById('to_phone').value.trim();
+  const div=document.getElementById('receiver_preview');
+  if(phone.length<7){ div.innerText=''; return; }
+  if(phone===currentUser.phone){ div.innerText='⚠️ Cannot send to yourself'; div.style.color='#d00'; return; }
+  div.innerText='Checking...';
+  try{
+    const r=await api('/balance/'+phone);
+    if(r.error){ div.innerText='❌ '+r.error; div.style.color='#d00'; }
+   else { 
+  if(r.phone==='0711000000'){ div.innerText='❌ Invalid receiver'; div.style.color='#d00'; }
+  else { div.innerText='✅ Sending to: '+r.name+' ('+r.phone+')'; div.style.color='#00a651'; }
+}
+  }catch(e){ div.innerText=''; }
+}
+</script>
+</body>
+</html>

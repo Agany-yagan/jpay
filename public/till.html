@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>JPay Till - Agent</title>
+<style>
+body{font-family:sans-serif;background:#0a0a0a;color:#fff;padding:15px}
+.card{background:#1e1e1e;padding:15px;border-radius:12px;margin:12px 0}
+input,button{width:100%;padding:12px;margin:6px 0;border-radius:8px;border:0;box-sizing:border-box}
+input{background:#2a2a2a;color:#fff}
+button{background:#00ff88;color:#000;font-weight:bold}
+h2{color:#00ff88}
+.tab{display:flex;gap:10px}
+.tab button{flex:1;background:#333;color:#fff}
+.tab button.active{background:#00ff88;color:#000}
+</style>
+</head>
+<body>
+<h2>🏪 JPay Agent Till</h2>
+<div class="card">
+<label>Till Number</label><input id="till" placeholder="e.g 123456">
+<label>Agent PIN (your user PIN)</label><input id="agent_pin" type="password" placeholder="****">
+<button onclick="checkTill()">Check Till</button>
+<div id="tillInfo" style="margin-top:10px;color:#aaa"></div>
+</div>
+
+<div class="tab">
+<button id="btnDep" class="active" onclick="mode='deposit';this.classList.add('active');document.getElementById('btnWit').classList.remove('active')">Deposit (Cash -> Customer)</button>
+<button id="btnWit" onclick="mode='withdraw';this.classList.add('active');document.getElementById('btnDep').classList.remove('active')">Withdraw (Customer -> Cash)</button>
+</div>
+
+<div class="card">
+<label>Customer Phone</label><input id="cust" placeholder="0711...">
+<label>Amount KES</label><input id="amt" type="number" placeholder="1000">
+<label id="pinLabel">Customer PIN (for withdraw)</label><input id="cust_pin" type="password" placeholder="Customer PIN for withdraw">
+<button onclick="doTill()">Process</button>
+<div id="result" style="margin-top:10px"></div>
+</div>
+
+<div class="card">
+<h3>Register New Till</h3>
+<input id="reg_phone" placeholder="Agent User Phone (must exist)">
+<input id="reg_till" placeholder="New Till Number 6 digits">
+<input id="reg_name" placeholder="Agent Shop Name">
+<button onclick="regTill()" style="background:#ffcc00">Create Till</button>
+<div id="regRes"></div>
+</div>
+
+<script>
+let mode='deposit';
+async function checkTill(){
+  const till=document.getElementById('till').value.trim();
+  if(!till) return;
+  const r=await fetch('/till/'+till); const d=await r.json();
+  if(d.error) document.getElementById('tillInfo').innerHTML='❌ '+d.error;
+  else document.getElementById('tillInfo').innerHTML=`✅ ${d.name} | Phone: ${d.phone} | Float: ${d.float_balance} KES | Commission: ${d.commission_balance} KES`;
+}
+async function doTill(){
+  const till=document.getElementById('till').value.trim();
+  const cust=document.getElementById('cust').value.trim();
+  const amt=document.getElementById('amt').value.trim();
+  const agent_pin=document.getElementById('agent_pin').value.trim();
+  const cust_pin=document.getElementById('cust_pin').value.trim();
+  if(!till||!cust||!amt) return alert('Fill all');
+  const url = mode==='deposit'? '/till/deposit' : '/till/withdraw';
+  const body = mode==='deposit'? {till_number:till, customer_phone:cust, amount:amt, agent_pin} : {till_number:till, customer_phone:cust, amount:amt, customer_pin:cust_pin};
+  document.getElementById('result').textContent='Processing...';
+  const r=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+  const d=await r.json();
+  document.getElementById('result').innerHTML = d.success? `✅ ${d.message} | Fee: ${d.fee||5} Commission: ${d.commission}` : `❌ ${d.error}`;
+  if(d.success) checkTill();
+}
+async function regTill(){
+  const phone=document.getElementById('reg_phone').value.trim();
+  const till_number=document.getElementById('reg_till').value.trim();
+  const name=document.getElementById('reg_name').value.trim();
+  const r=await fetch('/api/agent/register',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({phone,till_number,name})});
+  const d=await r.json();
+  document.getElementById('regRes').textContent = d.success? `✅ Till ${d.agent.till_number} created for ${d.agent.name}` : `❌ ${d.error}`;
+}
+</script>
+</body>
+</html>

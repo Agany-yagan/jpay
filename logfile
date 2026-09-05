@@ -1,0 +1,62 @@
+2026-09-03 17:02:22.559 EAT [32610] LOG:  starting PostgreSQL 18.2 on arm-unknown-linux-androideabi, compiled by Android (13989888, +pgo, +bolt, +lto, +mlgo, based on r563880c) clang version 21.0.0 (https://android.googlesource.com/toolchain/llvm-project 5e96669f06077099aa41290cdb4c5e6fa0f59349), 32-bit
+2026-09-03 17:02:22.561 EAT [32610] LOG:  listening on IPv4 address "127.0.0.1", port 5432
+2026-09-03 17:02:22.563 EAT [32610] LOG:  listening on Unix socket "/data/data/com.termux/files/usr/tmp/.s.PGSQL.5432"
+2026-09-03 17:02:22.708 EAT [32618] LOG:  database system was shut down at 2026-09-03 17:01:57 EAT
+2026-09-03 17:02:22.725 EAT [32610] LOG:  database system is ready to accept connections
+2026-09-03 17:07:22.680 EAT [32616] LOG:  checkpoint starting: time
+2026-09-03 17:09:02.598 EAT [32616] LOG:  checkpoint complete: wrote 990 buffers (6.0%), wrote 3 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=99.675 s, sync=0.209 s, total=99.922 s; sync files=320, longest=0.005 s, average=0.001 s; distance=4664 kB, estimate=4664 kB; lsn=0/1BF1B80, redo lsn=0/1BF1AF0
+2026-09-03 17:12:56.089 EAT [699] FATAL:  no PostgreSQL user name specified in startup packet
+2026-09-03 17:27:23.005 EAT [32616] LOG:  checkpoint starting: time
+2026-09-03 17:27:25.180 EAT [32616] LOG:  checkpoint complete: wrote 21 buffers (0.1%), wrote 1 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=2.131 s, sync=0.003 s, total=2.176 s; sync files=16, longest=0.001 s, average=0.001 s; distance=44 kB, estimate=4202 kB; lsn=0/1BFCB88, redo lsn=0/1BFCAF8
+2026-09-03 17:34:59.542 EAT [32616] LOG:  checkpoint starting: time
+2026-09-03 17:34:59.795 EAT [32616] LOG:  checkpoint complete: wrote 1 buffers (0.0%), wrote 0 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=0.109 s, sync=0.003 s, total=0.254 s; sync files=1, longest=0.003 s, average=0.003 s; distance=0 kB, estimate=3781 kB; lsn=0/1BFCE80, redo lsn=0/1BFCE28
+2026-09-03 18:40:50.773 EAT [32616] LOG:  checkpoint starting: time
+2026-09-03 18:40:52.219 EAT [32616] LOG:  checkpoint complete: wrote 9 buffers (0.1%), wrote 0 SLRU buffers; 1 WAL file(s) added, 0 removed, 0 recycled; write=0.925 s, sync=0.004 s, total=1.448 s; sync files=5, longest=0.001 s, average=0.001 s; distance=44 kB, estimate=3408 kB; lsn=0/1C080A8, redo lsn=0/1C08050
+2026-09-03 18:49:49.108 EAT [10852] ERROR:  column "balance" does not exist at character 68
+2026-09-03 18:49:49.108 EAT [10852] STATEMENT:  UPDATE users SET balance = balance + $1 WHERE phone = $2 RETURNING balance
+2026-09-03 18:49:49.855 EAT [10855] ERROR:  column "balance" of relation "users" does not exist at character 43
+2026-09-03 18:49:49.855 EAT [10855] STATEMENT:  INSERT INTO users (phone, name, pin_hash, balance) VALUES ($1, 'JPay Admin', 'admin', 0) ON CONFLICT (phone) DO NOTHING
+2026-09-03 18:49:49.929 EAT [10855] ERROR:  column "balance" does not exist at character 21
+2026-09-03 18:49:49.929 EAT [10855] STATEMENT:  SELECT name, phone, balance FROM users WHERE phone = $1
+2026-09-03 18:49:50.003 EAT [10859] ERROR:  column "balance" does not exist at character 21
+2026-09-03 18:49:50.003 EAT [10859] STATEMENT:  SELECT name, phone, balance FROM users WHERE phone = $1
+2026-09-03 18:49:50.067 EAT [10862] ERROR:  column "balance" does not exist at character 21
+2026-09-03 18:49:50.067 EAT [10862] STATEMENT:  SELECT name, phone, balance FROM users WHERE phone = $1
+2026-09-03 18:50:50.373 EAT [32616] LOG:  checkpoint starting: time
+2026-09-03 18:50:50.507 EAT [32616] LOG:  checkpoint complete: wrote 1 buffers (0.0%), wrote 1 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=0.112 s, sync=0.001 s, total=0.136 s; sync files=2, longest=0.001 s, average=0.001 s; distance=0 kB, estimate=3067 kB; lsn=0/1C08400, redo lsn=0/1C083A8
+2026-09-03 18:50:50.649 EAT [10922] ERROR:  column "balance" of relation "users" does not exist at character 43
+2026-09-03 18:50:50.649 EAT [10922] STATEMENT:  INSERT INTO users (phone, name, pin_hash, balance) VALUES ($1, 'JPay Admin', 'admin', 0) ON CONFLICT (phone) DO NOTHING
+2026-09-03 18:55:50.589 EAT [32616] LOG:  checkpoint starting: time
+2026-09-03 18:55:52.373 EAT [32616] LOG:  checkpoint complete: wrote 17 buffers (0.1%), wrote 1 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=1.735 s, sync=0.018 s, total=1.788 s; sync files=18, longest=0.003 s, average=0.001 s; distance=40 kB, estimate=2764 kB; lsn=0/1C12550, redo lsn=0/1C124C0
+2026-09-03 19:00:50.477 EAT [32616] LOG:  checkpoint starting: time
+2026-09-03 19:00:50.722 EAT [32616] LOG:  checkpoint complete: wrote 2 buffers (0.0%), wrote 0 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=0.216 s, sync=0.001 s, total=0.248 s; sync files=2, longest=0.001 s, average=0.001 s; distance=1 kB, estimate=2488 kB; lsn=0/1C12CC0, redo lsn=0/1C12C68
+2026-09-03 19:02:19.281 EAT [12109] ERROR:  duplicate key value violates unique constraint "users_phone_key"
+2026-09-03 19:02:19.281 EAT [12109] DETAIL:  Key (phone)=(0711000001) already exists.
+2026-09-03 19:02:19.281 EAT [12109] STATEMENT:  INSERT INTO users (phone, name, pin_hash, balance) VALUES ($1,$2,$3,0) RETURNING id, phone, name
+2026-09-03 19:05:50.824 EAT [32616] LOG:  checkpoint starting: time
+2026-09-03 19:05:51.202 EAT [32616] LOG:  checkpoint complete: wrote 3 buffers (0.0%), wrote 1 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=0.322 s, sync=0.005 s, total=0.379 s; sync files=4, longest=0.002 s, average=0.002 s; distance=1 kB, estimate=2239 kB; lsn=0/1C13330, redo lsn=0/1C132D8
+2026-09-03 19:10:50.280 EAT [32616] LOG:  checkpoint starting: time
+2026-09-03 19:10:50.743 EAT [32616] LOG:  checkpoint complete: wrote 4 buffers (0.0%), wrote 1 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=0.422 s, sync=0.003 s, total=0.464 s; sync files=5, longest=0.001 s, average=0.001 s; distance=2 kB, estimate=2016 kB; lsn=0/1C13C10, redo lsn=0/1C13BB8
+2026-09-05 07:51:12.074 EAT [16931] LOG:  starting PostgreSQL 18.2 on arm-unknown-linux-androideabi, compiled by Android (13989888, +pgo, +bolt, +lto, +mlgo, based on r563880c) clang version 21.0.0 (https://android.googlesource.com/toolchain/llvm-project 5e96669f06077099aa41290cdb4c5e6fa0f59349), 32-bit
+2026-09-05 07:51:12.076 EAT [16931] LOG:  listening on IPv4 address "127.0.0.1", port 5432
+2026-09-05 07:51:12.082 EAT [16931] LOG:  listening on Unix socket "/data/data/com.termux/files/usr/tmp/.s.PGSQL.5432"
+2026-09-05 07:51:12.200 EAT [16942] LOG:  database system was interrupted; last known up at 2026-09-03 19:10:50 EAT
+2026-09-05 07:51:14.887 EAT [16942] LOG:  database system was not properly shut down; automatic recovery in progress
+2026-09-05 07:51:14.933 EAT [16942] LOG:  redo starts at 0/1C13BB8
+2026-09-05 07:51:14.935 EAT [16942] LOG:  invalid record length at 0/1C13CC0: expected at least 24, got 0
+2026-09-05 07:51:14.935 EAT [16942] LOG:  redo done at 0/1C13C88 system usage: CPU: user: 0.00 s, system: 0.00 s, elapsed: 0.01 s
+2026-09-05 07:51:14.965 EAT [16940] LOG:  checkpoint starting: end-of-recovery immediate wait
+2026-09-05 07:51:15.005 EAT [16940] LOG:  checkpoint complete: wrote 0 buffers (0.0%), wrote 3 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=0.014 s, sync=0.004 s, total=0.041 s; sync files=2, longest=0.003 s, average=0.002 s; distance=0 kB, estimate=0 kB; lsn=0/1C13CC0, redo lsn=0/1C13CC0
+2026-09-05 07:51:15.046 EAT [16931] LOG:  database system is ready to accept connections
+2026-09-05 08:26:42.732 EAT [28807] ERROR:  column "pin" does not exist at character 40
+2026-09-05 08:26:42.732 EAT [28807] STATEMENT:  SELECT * FROM users WHERE phone=$1 AND pin=$2
+2026-09-05 08:27:21.196 EAT [28835] ERROR:  column "pin" does not exist at character 40
+2026-09-05 08:27:21.196 EAT [28835] STATEMENT:  SELECT * FROM users WHERE phone=$1 AND pin=$2
+2026-09-05 08:27:37.278 EAT [28846] ERROR:  column "pin" does not exist at character 40
+2026-09-05 08:27:37.278 EAT [28846] STATEMENT:  SELECT * FROM users WHERE phone=$1 AND pin=$2
+2026-09-05 08:29:18.374 EAT [29977] ERROR:  column "pin" does not exist at character 21
+2026-09-05 08:29:18.374 EAT [29977] STATEMENT:  SELECT phone, name, pin, balance/100 as kes FROM users ORDER BY id;
+2026-09-05 08:29:53.018 EAT [30036] ERROR:  column "pin" of relation "users" does not exist at character 18
+2026-09-05 08:29:53.018 EAT [30036] STATEMENT:  UPDATE users SET pin='1234' WHERE phone='0712345678';
+2026-09-05 08:31:14.790 EAT [16940] LOG:  checkpoint starting: time
+2026-09-05 08:31:15.346 EAT [16940] LOG:  checkpoint complete: wrote 5 buffers (0.0%), wrote 1 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=0.523 s, sync=0.006 s, total=0.557 s; sync files=6, longest=0.002 s, average=0.001 s; distance=20 kB, estimate=20 kB; lsn=0/1C19090, redo lsn=0/1C19038

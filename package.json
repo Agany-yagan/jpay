@@ -1,0 +1,15 @@
+{
+  "name": "jpay",
+  "version": "5.0.0",
+  "description": "JPay M-Pesa clone with Till",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "pg": "^8.23.0"
+  }
+}
