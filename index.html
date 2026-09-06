@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>JPay V5 - Test</title>
+<style>
+body{font-family:sans-serif;background:#f5f5f5;padding:20px;text-align:center}
+.card{background:white;padding:25px;border-radius:15px;max-width:400px;margin:auto;box-shadow:0 4px 15px rgba(0,0,0,.1)}
+input{width:100%;padding:12px;margin:10px 0;border-radius:8px;border:1px solid #ddd;font-size:16px}
+button{width:100%;padding:14px;background:#00b300;color:white;border:none;border-radius:8px;font-size:18px;font-weight:bold}
+#msg{margin-top:15px;font-weight:bold}
+</style>
+</head>
+<body>
+<div class="card">
+<h2>JPay V5</h2>
+<p>Live: jpay-fopo.onrender.com</p>
+<input id="phone" placeholder="Phone 2547XXXXXXXX" value="254">
+<input id="amount" type="number" placeholder="Amount" value="1">
+<button onclick="pay()">PAY - STK Push</button>
+<div id="msg"></div>
+<hr>
+<button onclick="checkBal()" style="background:#007bff;margin-top:10px">Check Balance</button>
+</div>
+<script>
+const API="https://jpay-fopo.onrender.com";
+async function pay(){
+ let phone=document.getElementById('phone').value;
+ let amount=document.getElementById('amount').value;
+ document.getElementById('msg').innerText="Sending STK...";
+ try{
+   let r=await fetch(API+"/api/stk",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({phone,amount})});
+   let d=await r.json();
+   document.getElementById('msg').innerText=JSON.stringify(d);
+   alert("Check your phone for STK popup!");
+ }catch(e){document.getElementById('msg').innerText=e;}
+}
+async function checkBal(){
+ let phone=document.getElementById('phone').value;
+ document.getElementById('msg').innerText="Checking...";
+ try{
+   let r=await fetch(API+"/balance/"+phone);
+   let d=await r.json();
+   document.getElementById('msg').innerText="Balance: "+JSON.stringify(d);
+ }catch(e){document.getElementById('msg').innerText=e;}
+}
+</script>
+</body>
+</html>
