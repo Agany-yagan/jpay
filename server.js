@@ -98,22 +98,34 @@ app.post('/callback', async (req,res)=>{
   }catch(e){console.error(e);}
   res.json({ResultCode:0,ResultDesc:'Accepted'});
 });
-// SEND MONEY INSIDE JPAY - FREE
 app.post("/api/send", async (req, res) => {
-  const { fromPhone, toPhone, amount } = req.body;
-  
-  // 1. Check sender has balance
-  const sender = await db.query("SELECT balance FROM users WHERE phone=$1", [fromPhone]);
-  if (sender.rows[0].balance < amount) return res.status(400).json({error: "Insufficient balance"});
-  
-  // 2. Deduct from sender, add to receiver
-  await db.query("UPDATE users SET balance = balance - $1 WHERE phone=$2", [amount, fromPhone]);
-  await db.query("UPDATE users SET balance = balance + $1 WHERE phone=$2", [amount, toPhone]);
-  
-  // 3. Save transaction
-  await db.query("INSERT INTO transactions (from_phone, to_phone, amount) VALUES ($1,$2,$3)", [fromPhone, toPhone, amount]);
-  
-  res.json({success: true, message: `Sent ${amount} to ${toPhone}`});
+  try {
+    let { fromPhone, toPhone, amount } = req.body;
+    amount = Number(amount);
+
+    // normalize phones like you do elsewhere
+    const norm = (p) => p.replace(/^0/,'254').replace(/^\+/,'').replace(/^07/,(m)=>'254'+m.slice(2));
+    fromPhone = fromPhone.replace(/^0/,'254').replace(/^\+/,'');
+    if(fromPhone.startsWith('07')) fromPhone='254'+fromPhone.slice(1);
+    toPhone = toPhone.replace(/^0/,'254').replace(/^\+/,'');
+    if(toPhone.startsWith('07')) toPhone='254'+toPhone.slice(1);
+
+    const senderRes = await pool.query("SELECT balance FROM users WHERE phone=$1", [fromPhone]);
+    if(!senderRes.rows[0]) return res.status(404).json({error: "Sender not found"});
+    if(senderRes.rows[0].balance < amount) return res.status(400).json({error: "Insufficient balance"});
+
+    const receiverRes = await pool.query("SELECT phone FROM users WHERE phone=$1", [toPhone]);
+    if(!receiverRes.rows[0]) return res.status(404).json({error: "Receiver not found"});
+
+    await pool.query("UPDATE users SET balance = balance - $1 WHERE phone=$2", [amount, fromPhone]);
+    await pool.query("UPDATE users SET balance = balance + $1 WHERE phone=$2", [amount, toPhone]);
+    await pool.query("INSERT INTO transactions (from_phone, to_phone, amount) VALUES ($1,$2,$3)", [fromPhone, toPhone, amount]);
+
+    res.json({success: true, message: `Sent ${amount} to ${toPhone}`});
+  } catch(e){
+    console.error("SEND ERROR:", e);
+    res.status(500).json({error: e.message});
+  }
 });
 
 app.post('/deposit', async (req,res)=>{
