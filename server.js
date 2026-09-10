@@ -144,8 +144,8 @@ app.get('/balance/:phone', async (req,res)=>{
   if(!r.rows[0]) return res.status(404).json({error:'User not found'});
   res.json(r.rows[0]);
 });
+app.get('/',(req,res)=>res.send('JPay V6 Fixed - Send Working'));
 
-app.get('/',(req,res)=>res.send('JPay V5 Live - Daraja STK Working'));
 
 const PORT=process.env.PORT||10000;
 app.listen(PORT,()=>console.log(`JPay live on ${PORT}`));
