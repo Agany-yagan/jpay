@@ -9,7 +9,7 @@ app.use(express.json());
 app.use(cors());
 
 const pool = process.env.DATABASE_URL
- ? new Pool({ connectionString: process.env.DATABASE_URL, ssl: { rejectUnauthorized: false } })
+? new Pool({ connectionString: process.env.DATABASE_URL, ssl: { rejectUnauthorized: false } })
   : new Pool({
       host: process.env.PGHOST,
       user: process.env.PGUSER,
@@ -98,13 +98,11 @@ app.post('/callback', async (req,res)=>{
   }catch(e){console.error(e);}
   res.json({ResultCode:0,ResultDesc:'Accepted'});
 });
+
 app.post("/api/send", async (req, res) => {
   try {
     let { fromPhone, toPhone, amount } = req.body;
     amount = Number(amount);
-
-    // normalize phones like you do elsewhere
-    const norm = (p) => p.replace(/^0/,'254').replace(/^\+/,'').replace(/^07/,(m)=>'254'+m.slice(2));
     fromPhone = fromPhone.replace(/^0/,'254').replace(/^\+/,'');
     if(fromPhone.startsWith('07')) fromPhone='254'+fromPhone.slice(1);
     toPhone = toPhone.replace(/^0/,'254').replace(/^\+/,'');
@@ -112,14 +110,17 @@ app.post("/api/send", async (req, res) => {
 
     const senderRes = await pool.query("SELECT balance FROM users WHERE phone=$1", [fromPhone]);
     if(!senderRes.rows[0]) return res.status(404).json({error: "Sender not found"});
-    if(senderRes.rows[0].balance < amount) return res.status(400).json({error: "Insufficient balance"});
+    if(Number(senderRes.rows[0].balance) < amount) return res.status(400).json({error: "Insufficient balance"});
 
     const receiverRes = await pool.query("SELECT phone FROM users WHERE phone=$1", [toPhone]);
     if(!receiverRes.rows[0]) return res.status(404).json({error: "Receiver not found"});
 
     await pool.query("UPDATE users SET balance = balance - $1 WHERE phone=$2", [amount, fromPhone]);
     await pool.query("UPDATE users SET balance = balance + $1 WHERE phone=$2", [amount, toPhone]);
-    await pool.query("INSERT INTO transactions (from_phone, to_phone, amount) VALUES ($1,$2,$3)", [fromPhone, toPhone, amount]);
+
+    // Fixed to match your actual transactions table
+    await pool.query("INSERT INTO transactions (phone, amount, type, mpesa_code) VALUES ($1,$2,'send',$3)", [fromPhone, -amount, 'jpay-'+Date.now()]);
+    await pool.query("INSERT INTO transactions (phone, amount, type, mpesa_code) VALUES ($1,$2,'receive',$3)", [toPhone, amount, 'jpay-'+Date.now()]);
 
     res.json({success: true, message: `Sent ${amount} to ${toPhone}`});
   } catch(e){
