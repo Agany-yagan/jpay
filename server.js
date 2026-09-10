@@ -98,6 +98,23 @@ app.post('/callback', async (req,res)=>{
   }catch(e){console.error(e);}
   res.json({ResultCode:0,ResultDesc:'Accepted'});
 });
+// SEND MONEY INSIDE JPAY - FREE
+app.post("/api/send", async (req, res) => {
+  const { fromPhone, toPhone, amount } = req.body;
+  
+  // 1. Check sender has balance
+  const sender = await db.query("SELECT balance FROM users WHERE phone=$1", [fromPhone]);
+  if (sender.rows[0].balance < amount) return res.status(400).json({error: "Insufficient balance"});
+  
+  // 2. Deduct from sender, add to receiver
+  await db.query("UPDATE users SET balance = balance - $1 WHERE phone=$2", [amount, fromPhone]);
+  await db.query("UPDATE users SET balance = balance + $1 WHERE phone=$2", [amount, toPhone]);
+  
+  // 3. Save transaction
+  await db.query("INSERT INTO transactions (from_phone, to_phone, amount) VALUES ($1,$2,$3)", [fromPhone, toPhone, amount]);
+  
+  res.json({success: true, message: `Sent ${amount} to ${toPhone}`});
+});
 
 app.post('/deposit', async (req,res)=>{
   let {phone,amount}=req.body;
